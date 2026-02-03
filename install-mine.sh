@@ -19,7 +19,7 @@ zypper update -y
 zypper install -y wget gzip
 sleep 2
 
-sudo mv /src/
+
 
 # 3. Limpar instalações antigas e preparar diretório
 echo -e "Limpando diretórios antigos..."
@@ -30,14 +30,19 @@ mkdir -p /opt/minecraft-launcher
 # 4. Baixando Minecraft
 echo -e "Baixando o launcher oficial"
 cd /tmp
+git clone https://github.com/nek-ros/Minecraft-Installer-for-Opensuse.git
+sleep 2 
+mv /tmp/Minecraft-Installer-for-Opensuse/src/launcher.png /opt/minecraft-launcher/
+sleep 2
 wget https://launcher.mojang.com/download/Minecraft.tar.gz
-# wget https://cdn.iconscout.com/icon/free/png-256/free-minecraft-icon-svg-download-png-282774.png
+
+
+
 
 # 5. Descompactar
 echo -e "Descompactando arquivos..."
 tar -xvzf Minecraft.tar.gz
 # Move o conteúdo de dentro da pasta extraída para /opt/minecraft-launcher
-mv free-minecraft-icon-svg-download-png-282774.png /opt/minecraft-launcher/launcher.png
 mv minecraft-launcher/* /opt/minecraft-launcher/
 
 

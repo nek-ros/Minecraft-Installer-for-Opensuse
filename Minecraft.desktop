@@ -1,0 +1,10 @@
+Minecraft.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Minecraft
+Comment=Minecraft Java
+Exec=/usr/share/minecraft-launcher
+Icon=minecraft
+Terminal=false
+Categories=Games

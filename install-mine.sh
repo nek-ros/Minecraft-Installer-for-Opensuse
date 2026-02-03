@@ -23,7 +23,7 @@ echo -e "Baixando arquivos necessários...  "
 mkdir /opt/minecraft-launcher
 cd /opt/minecraft-launcher
 wget -P /opt/minecraft-launcher https://launcher.mojang.com/download/Minecraft.tar.gz 
-
+wget -P /opt/minecraft-launcher 
 sleep 2
 
 # .5 Descompactar arquivos

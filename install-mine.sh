@@ -1,47 +1,67 @@
 #!/bin/bash
 
-echo -e "Iniciando a instalação..."
+# Cores para facilitar a leitura
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
 
-sleep 2
-# 1. Verificar se o usuário é root (sudo)
+echo -e "${GREEN}Iniciando a instalação do Minecraft...${NC}"
 
+# 1. Verificar se o usuário é root
+if [ "$EUID" -ne 0 ]; then 
+  echo -e "${RED}Erro: Por favor, execute como root (use sudo).${NC}"
+  exit 1
+fi
 
-# 2. Atualizar repositórios
-echo -e "Atualizando pacotes do sistema..."
-zypper update && zypper upgrade -y
-
-sleep 2
-
-# 3. Instalar dependências (Exemplo: Git e Curl)
-echo -e "Instalando wget..."
+# 2. Atualizar repositórios e instalar dependências
+echo -e "Atualizando pacotes e instalando wget/gzip..."
+zypper update -y
 zypper install -y wget gzip
 
-sleep 2
+# 3. Limpar instalações antigas e preparar diretório
+echo -e "Limpando diretórios antigos..."
+rm -rf /opt/minecraft-launcher
+rm -f /usr/bin/minecraft-launcher
+mkdir -p /opt/minecraft-launcher
 
 # 4. Baixando Minecraft
-echo -e "Baixando arquivos necessários...  "
-mkdir /opt/minecraft-launcher
-cd /opt/minecraft-launcher
-wget -P /opt/minecraft-launcher https://launcher.mojang.com/download/Minecraft.tar.gz 
-wget -P /opt/minecraft-launcher 
-sleep 2
+echo -e "Baixando o launcher oficial..."
+cd /tmp
+wget https://launcher.mojang.com/download/Minecraft.tar.gz
 
-# .5 Descompactar arquivos
-echo -e "Descompactando arquivos...  " 
-tar -xvzf Minecraft.tar.gz 
-sleep 2
+# 5. Descompactar
+echo -e "Descompactando arquivos..."
+tar -xvzf Minecraft.tar.gz
+# Move o conteúdo de dentro da pasta extraída para /opt/minecraft-launcher
+mv minecraft-launcher/* /opt/minecraft-launcher/
 
-# 6. Mover arquivos para os diretórios apropriados
-echo -e "Movendo blocos para /usr/bin...  "
-cd minecraft-launcher
-sudo mv minecraft-launcher /usr/bin/ # mv minecraft-launcher /usr/bin/minecraft-launcher
+# 6. Criar o link simbólico (Executável)
+# Isso faz com que o comando 'minecraft-launcher' funcione no terminal
+ln -sf /opt/minecraft-launcher/minecraft-launcher /usr/bin/minecraft-launcher
 
-sleep 2
+# 7. Criar o arquivo .desktop (O seu erro de ícone estava aqui)
+echo -e "Criando atalho no menu de aplicativos..."
+cat <<EOF > /usr/share/applications/Minecraft.desktop
+[Desktop Entry]
+Name=Minecraft
+Comment=Launcher oficial do Minecraft
+GenericName=Game
+Exec=/usr/bin/minecraft-launcher
+Icon=/opt/minecraft-launcher/launcher.png
+Terminal=false
+Type=Application
+Categories=Game;Simulation;
+Keywords=mojang;minecraft;launcher;
+StartupNotify=true
+EOF
 
-# 5. Simular o download de um arquivo
-# curl -L https://link-do-seu-app.com/binario -o /opt/meu_projeto/app
+# 8. Ajustar permissões (Essencial para o GNOME mostrar o ícone)
+chmod +x /usr/share/applications/Minecraft.desktop
+chmod +x /usr/bin/minecraft-launcher
 
-# 6. Finalização
-echo -e "-----------------------------------------"
-echo -e "Instalação concluída com sucesso!"
-echo -e "Obrigado por utilizar o script de automação."
+# 9. Atualizar base de dados de aplicativos
+update-desktop-database /usr/share/applications/
+
+echo -e "${GREEN}-----------------------------------------${NC}"
+echo -e "${GREEN}Instalação concluída com sucesso!${NC}"
+echo -e "O ícone deve aparecer no seu menu agora."
